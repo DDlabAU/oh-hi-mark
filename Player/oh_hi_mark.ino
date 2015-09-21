@@ -47,8 +47,8 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 5 = shame
 */
 
-#define NUM_FILES 7
-char *tracks[NUM_FILES] = {"0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "glar.mp3"};
+#define NUM_FILES 8
+char *tracks[NUM_FILES] = {"0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "glar.mp3","uffe.mp3"};
 
 int relayL = 5;
 int relayR = 6;
