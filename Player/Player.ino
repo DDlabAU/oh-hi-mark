@@ -30,10 +30,10 @@
 #define BREAKOUT_DCS    8      // VS1053 Data/command select pin (output)
 
 //These variables are used for the digital potentiometer:
-const byte REG0=B00000000; //Register 0 Write command
-const byte REG1=B00010000; //Register 1 Write command
-int potCS= 2;
-int i=0;
+const byte REG0=B00000000; //Register 0 Write command for one channel of potentiometer
+const byte REG1=B00010000; //Register 1 Write command for the other channel of potentiometer
+int potCS=2; //chip select pin for potentiometer
+
 
 
 // These are common pins between breakout and shield
@@ -55,21 +55,11 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 
 #define NUM_FILES 8
 char *tracks[NUM_FILES] = {"0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "glar.mp3","uffe.mp3"};
-/*
-int relayL = 5;
-int relayR = 6;
-*/
+
 void setup() {
-  /*
-  pinMode(relayL, OUTPUT);
-  pinMode(relayR, OUTPUT);
-  digitalWrite(relayL, LOW);
-  digitalWrite(relayR, LOW);
-  */
   pinMode (potCS, OUTPUT);
   SPI.begin();
   digitalPotWrite(255); //full on
-
 
   Serial.begin(9600);
   Serial.println("Adafruit VS1053 Simple Test");
@@ -95,12 +85,7 @@ void setup() {
   Serial.println(F("Playing boot"));
   musicPlayer.playFullFile(tracks[0]);
 
-        /*for (i = 255; i >= 0; i--) //Crossfade out
-        {
-        digitalPotWrite(i);
-        delay(10);
-        }*/
-        digitalPotWrite(0);
+  digitalPotWrite(0); //full off
 }
 
 void loop() {
@@ -109,33 +94,12 @@ void loop() {
     int integer = Serial.parseInt();
     Serial.println(integer);
     if(integer >= 0 && integer < NUM_FILES){
-    //  Serial.println("inside if");
-    
-        /*for (i = 0; i <= 255; i++) //Crossfade in
-        {
-        digitalPotWrite(i);
-        delay(2);
-        }*/
-  digitalPotWrite(255); //full on
 
-    
-//      digitalWrite(relayL, LOW);
-//      digitalWrite(relayR, LOW);
-    
-        musicPlayer.playFullFile(tracks[integer]);
-      
-      /*
-        for (i = 255; i >= 0; i--) //Crossfade out
-        {
-        digitalPotWrite(i);
-        delay(2);
-        }
-      */
-      digitalPotWrite(0);
-      
-//      digitalWrite(relayL, HIGH);
-//      digitalWrite(relayR, HIGH);
-      while(Serial.available()){
+	digitalPotWrite(255); //full on
+	musicPlayer.playFullFile(tracks[integer]);
+	digitalPotWrite(0); //full off
+
+	while(Serial.available()){
         Serial.read();
       }
     }
@@ -148,12 +112,12 @@ void loop() {
 int digitalPotWrite(int value)
 {
   digitalWrite(potCS, LOW);
-  SPI.transfer(REG0);
+  SPI.transfer(REG0); //channel #0 (left?)
   SPI.transfer(value);
   digitalWrite(potCS, HIGH);
   delay(2);
   digitalWrite(potCS, LOW);
-  SPI.transfer(REG1);
+  SPI.transfer(REG1); //channel #1 (right?)
   SPI.transfer(value);
   digitalWrite(potCS, HIGH);
   delay(2);
